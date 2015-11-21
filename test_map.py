@@ -1,3 +1,10 @@
+# -*- coding: utf-8 -*-
+"""
+Created on Fri Nov 20 11:24:51 2015
+
+@author: Owner
+"""
+
 # Import pandas
 import pandas
 
@@ -6,15 +13,15 @@ import matplotlib.pyplot as plt
 from mpl_toolkits.basemap import Basemap
 
 # Set iPython to display visualization inline
-#%matplotlib inline
+%matplotlib inline
 
-businesss_df = pandas.read_csv('data/csv/1997business_licences.csv')
+business_df = pandas.read_csv('/resources/business_licences.csv', dtype={12: str})
+business_df = business_df.dropna()
+business_df.head()
 
-business_df = businesss_df.dropna()
-
-# Display Latitudes and Longitudes in a table
-#df = pandas.DataFrame(business_df, columns = ['Longitude', 'Latitude'])
-#df
+# Group data by category
+businesses_by_type = business_df.groupby(['BusinessType'])
+businesses_by_type.head()
 
 # Size of Figure
 fig = plt.figure(figsize=(20,10))
@@ -38,11 +45,18 @@ map.fillcontinents(color = '#888888')
 # Draw the map boundaries
 map.drawmapboundary(fill_color='#f4f4f4')
 
-# Define our longitude and latitude points
-x,y = map(business_df['Longitude'].values, business_df['Latitude'].values)
-
-# Plot them using round markers of size 6
-map.plot(x, y, 'ro', markersize=6)
+count = 0;
+for name, group in businesses_by_type:
+    # Define our longitude and latitude points
+    x,y = map(group['Longitude'].values, group['Latitude'].values)
+    # Plot them using round markers of size 6
+    temp = ""
+    if count % 2 == 0:
+        temp = "#33b5e5"
+    else:
+        temp = "#ff0000"
+    map.plot(x, y, 'o', markersize=3)
+    count = count+1
 
 # Show the map
 plt.show()
